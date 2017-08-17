@@ -1,0 +1,97 @@
+Public Sub CallCode()
+    Dim chrom As String
+    Dim genomic As String
+    Dim var_in_region
+    Dim script_path As String
+    chrom = Worksheets("Settings").Range("W1").Value
+    genomic = Worksheets("Settings").Range("W2").Value
+    scriptpath = "X:\Personal folders\Stuart Cannon\Jobs\automated data gathering\variants in region\test_script.py"
+    var_in_region = Shell("C:\Program Files\Python36-32\python.exe " & scriptpath & " " & chrom & " " & genomic, vbNormalFocus)
+    MsgBox (var_in_region)
+End Sub
+
+
+
+Public Function ShellRun(sCmd As String) As String
+
+    'Run a shell command, returning the output as a string'
+
+    Dim oShell As Object
+    Set oShell = CreateObject("WScript.Shell")
+
+    'run command'
+    Dim oExec As Object
+    Dim oOutput As Object
+    Set oExec = oShell.Exec(sCmd)
+    Set oOutput = oExec.StdOut
+
+    'handle the results as they are written to and read from the StdOut object'
+    Dim s As String
+    Dim sLine As String
+    While Not oOutput.AtEndOfStream
+        sLine = oOutput.ReadLine
+        'If sLine <> "" Then s = s & sLine & vbCrLf
+        If sLine <> "" Then s = sLine & vbCrLf
+    Wend
+
+    ShellRun = s
+
+End Function
+Public Sub TestString()
+    Dim chrom As String
+    Dim genomic As String
+    Dim scriptpath As String
+    Dim cmd_str As String
+    Dim nmcheck As String
+    Dim text_return As String
+    Dim test_array() As String
+    Application.ScreenUpdating = False
+    chrom = Worksheets("Settings").Range("V1").Value
+    genomic = Worksheets("Settings").Range("V2").Value
+    'nmcheck = "X:\Personal folders\Stuart Cannon\Jobs\automated data gathering\cx_freeze_programs\NM_checker\tkinter_test.exe"
+    cmd_taker = "X:\Personal folders\Stuart Cannon\Jobs\automated data gathering\cx_freeze_programs\get_exac_cov\exe.win32-3.6\test_script.exe"
+    'scriptpath = "X:\Personal folders\Stuart Cannon\Jobs\automated data gathering\variants in region\test_script.py"
+    'script_path = "C:/Users/CannonS/Desktop/test_script.py"
+    'python_path = "C:\Program\ Files\Python36-32\python.exe "
+    'cmd_string = "cmd.exe /c python " & script_path & " " & chrom & " " & genomic & ""
+    cmd_str = cmd_taker & " " & chrom & " " & genomic
+    'MsgBox (cmd_str)
+    'MsgBox ShellRun("cmd.exe /c dir C:\Users\")
+    'MsgBox ShellRun(cmd_string)
+    text_return = ShellRun(cmd_str)
+    test_array() = Split(text_return)
+    'Var new_array = test_array.slice(-1)
+    'MsgBox Join(test_array(), vbCrLf)
+    Range("$K$28").Value = test_array
+    Range("$K$28").Value = Replace(Range("$K$28").Value, Chr(10), "")
+    Range("$I$28").Value = 0
+    
+    If Worksheets("Settings").Range("V1").Value = "X" Then
+    Else
+            Range("$K$30").Value = Int(Range("$K$28").Value / 2)
+            Range("$I$30").Value = 0
+    End If
+    Application.ScreenUpdating = True
+End Sub
+
+Public Sub Revel()
+    Dim chrom As String
+    Dim genomic As String
+    Dim cmd_str As String
+    Dim text_return As String
+    Dim text_array() As String
+    Application.ScreenUpdating = False
+    chrom = Worksheets("Settings").Range("V1").Value
+    genomic = Worksheets("Settings").Range("V2").Value
+    aa1 = Worksheets("Settings").Range("V6").Value
+    aa2 = Worksheets("Settings").Range("V7").Value
+    
+    cmd_str = "FINDSTR /B /R /C:" & Chr(34) & chrom & "," & genomic & ",.,.," & aa1 & "," & aa2 & Chr(34) & " " & Chr(34) & "X:\ACMG variant classification\Revel Data\revel_chrom_" & chrom & ".csv" & Chr(34)
+       
+    text_return = ShellRun(cmd_str)
+    
+    text_array() = Split(text_return, ",")
+    
+    Worksheets("in silico").Range("F19").Value = Replace(text_array(6), Chr(10), "")
+    
+End Sub
